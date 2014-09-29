@@ -129,7 +129,7 @@ $razrbit->marketsHistoricalPrice("USD","2014-03-03");
 ```
 Returns the historical price at the given date. ```date``` must be a date in the ```yyyy-mm-dd``` format.
 
-### Webhooks
+### Notifications
 
 ```
 $razrbit->notificationAddress($exampleAddress,"example@example.com");
