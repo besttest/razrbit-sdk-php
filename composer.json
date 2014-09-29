@@ -1,5 +1,8 @@
 {
     "name": "luxstack/razrbit",
+    "type": "library",
+    "description": "Razrbit Bitcoin SDK for LUXSTACK platform"
+    "keywords": ["bitcoin"],
     "minimum-stability": "stable",
     "license": "MIT",
 
