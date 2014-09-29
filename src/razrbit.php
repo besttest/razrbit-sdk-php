@@ -1,16 +1,14 @@
 <?php
-namespace Luxstack\Razrbit;
-
 /**
  * Copyright 2014 LUXSTACK, Inc.
  *
  */
 
 if (!function_exists('curl_init')) {
-  throw new \Exception('Razrbit needs the CURL PHP extension.');
+  throw new Exception('Razrbit needs the CURL PHP extension.');
 }
 if (!function_exists('json_decode')) {
-  throw new \Exception('Razrbit needs the JSON PHP extension.');
+  throw new Exception('Razrbit needs the JSON PHP extension.');
 }
 
 /**
@@ -21,7 +19,7 @@ class Razrbit
   /**
    * Version of this API code.
    */
-  const VERSION = '0.2.1';
+  const VERSION = '0.1.1';
 
   /**
    * curl requests are sent to this URL.
@@ -52,7 +50,7 @@ class Razrbit
     CURLOPT_CONNECTTIMEOUT => 10,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_TIMEOUT        => 60,
-    CURLOPT_USERAGENT      => 'razrbit-php-0.2.1'
+    CURLOPT_USERAGENT      => 'razrbit-php-0.1.1'
   );
 
   /**
@@ -112,7 +110,7 @@ class Razrbit
     if ($result === false) {
       $curl_error = curl_error($ch);
       curl_close($ch);
-      throw new \Exception('Curl\Exception' . $curl_error);
+      throw new Exception('CurlException' . $curl_error);
     }
     curl_close($ch);
     return $result;
@@ -125,7 +123,7 @@ class Razrbit
    * @param Array       $params to be sent with the request (optional)  
    * @param CurlHandler $ch   (optional) initialized curl handle
    * @return Array of json_decoded response
-   * @throws \Exception
+   * @throws Exception
    */
   protected function makeRazrbitRequest($apiPath, $params=null, $ch=null) {
       $path = self::ENDPOINT . "/api/".self::ENDPOINT_VERSION.$apiPath;
@@ -134,7 +132,7 @@ class Razrbit
       $result_array = json_decode($this->makeRequest($path, $params, $ch),TRUE); // TRUE = json_decode return array
       
       if(!empty($result_array['result']) && $result_array['result'] == "error") {
-        throw new \Exception($result_array['message']);
+        throw new Exception($result_array['message']);
       } else {
         return $result_array;
       }      
@@ -143,7 +141,7 @@ class Razrbit
    * Creates a new bitcoin address in your wallet
    * 
    * @return String new address
-   * @throws \Exception
+   * @throws Exception
    */
   public function walletCreateNewAddress() {
       $result_array = $this->makeRazrbitRequest("/wallet/createNewAddress");
@@ -151,7 +149,7 @@ class Razrbit
       if(!empty($result_array['address'])) {
           return $result_array['address'];
       } else {
-          throw new \Exception("Unable to parse result.");
+          throw new Exception("Unable to parse result.");
       }
   }
   
@@ -162,18 +160,18 @@ class Razrbit
    * @param String $toAddress
    * @param Integer $amount
    * @return Boolean success
-   * @throws \Exception
+   * @throws Exception
    */
   public function walletSendAmount($fromAddressPrivateKey,$toAddress,$amount) {
       if(!self::couldBeAPrivateAddress($fromAddressPrivateKey)) {
-          throw new \Exception("Invalid fromAddressPrivateKey ". $fromAddressPrivateKey);
+          throw new Exception("Invalid fromAddressPrivateKey ". $fromAddressPrivateKey);
       }
       if(!self::couldBeAnAddress($toAddress)) {
-          throw new \Exception("Invalid toAddress ". $toAddress);
+          throw new Exception("Invalid toAddress ". $toAddress);
       }
       $amount = intval($amount);
       if(!is_numeric($amount) || !($amount >= 0)) {
-          throw new \Exception("Invalid amount ". $amount);
+          throw new Exception("Invalid amount ". $amount);
       }
       $params = $this->baseCurlParams;
       $params['fromAddressPrivateKey'] = $fromAddressPrivateKey;
@@ -184,7 +182,7 @@ class Razrbit
       if(!empty($result_array['result'])) {
           return $result_array['result'] == "OK";
       } else {
-          throw new \Exception("Unable to parse result.");
+          throw new Exception("Unable to parse result.");
       }
   }
   
@@ -193,11 +191,11 @@ class Razrbit
    * 
    * @param String $address
    * @return Float number of bits in address
-   * @throws \Exception
+   * @throws Exception
    */
   public function walletGetBalanceFromAddress($address) {
       if(!self::couldBeAnAddress($address)) {
-          throw new \Exception("Invalid address ". $address);
+          throw new Exception("Invalid address ". $address);
       }
       $params = $this->baseCurlParams;
       $params['address'] = $address;
@@ -207,7 +205,7 @@ class Razrbit
       if(is_float($result_array['balance'])) {
           return $result_array['balance'];
       } else {
-          throw new \Exception("Unable to parse result.");
+          throw new Exception("Unable to parse result.");
       }
   }
   
@@ -216,11 +214,11 @@ class Razrbit
    * 
    * @param String $blockHash
    * @return Mixed Array of details about given block or String error message
-   * @throws \Exception
+   * @throws Exception
    */
   public function explorerBlock($blockHash) {
       if(!self::couldBeABlockHash($blockHash)) {
-          throw new \Exception("Invalid block hash " . $blockHash);
+          throw new Exception("Invalid block hash " . $blockHash);
       }
       $params = $this->baseCurlParams;
       $params['blockHash'] = $blockHash;
@@ -230,7 +228,7 @@ class Razrbit
       if(!empty($result_array['difficulty'])) {
           return $result_array;
       } else {
-          throw new \Exception("Unable to parse result.");
+          throw new Exception("Unable to parse result.");
       }
   }
   
@@ -239,11 +237,11 @@ class Razrbit
    * 
    * @param String $transaction
    * @return Array details about transaction
-   * @throws \Exception
+   * @throws Exception
    */
   public function explorerTransaction($transaction) {
       if(!self::couldBeATransaction($transaction)) {
-          throw new \Exception("Invalid transaction " . $transaction);
+          throw new Exception("Invalid transaction " . $transaction);
       }
       $params = $this->baseCurlParams;
       $params['transactionHash'] = $transaction;
@@ -253,7 +251,7 @@ class Razrbit
       if(!empty($result_array['txid'])) {
           return $result_array;
       } else {
-          throw new \Exception("Unable to parse result.");
+          throw new Exception("Unable to parse result.");
       }
       
   }
@@ -264,11 +262,11 @@ class Razrbit
    * 
    * @param String $address
    * @return Array of information about address
-   * @throws \Exception
+   * @throws Exception
    */
   public function explorerAddress($address) {
       if(!self::couldBeAnAddress($address)) {
-          throw new \Exception("Invalid address " . $address);
+          throw new Exception("Invalid address " . $address);
       }
       $params = $this->baseCurlParams;
       $params['address'] = $address;
@@ -278,7 +276,7 @@ class Razrbit
       if(!empty($result_array['addrStr'])) {
           return $result_array;
       } else {
-          throw new \Exception("Unable to parse result.");
+          throw new Exception("Unable to parse result.");
       }
   }
   
@@ -289,11 +287,11 @@ class Razrbit
    * 
    * @param String $address
    * @return Array of unspent outputs
-   * @throws \Exception
+   * @throws Exception
    */
   public function explorerAddressUnspentOutputs($address) {
       if(!self::couldBeAnAddress($address)) {
-          throw new \Exception("Invalid address " . $address);
+          throw new Exception("Invalid address " . $address);
       }
       $params = $this->baseCurlParams;
       $params['address'] = $address;
@@ -303,7 +301,7 @@ class Razrbit
       if(!empty($result_array['unspentOutputs'])) {
           return $result_array['unspentOutputs'];
       } else {
-          throw new \Exception("Unable to parse result.");
+          throw new Exception("Unable to parse result.");
       }
   }
 
@@ -311,7 +309,7 @@ class Razrbit
    * Retrieve the current network difficulty
    * 
    * @return String representing difficulty
-   * @throws \Exception
+   * @throws Exception
    */
   public function networkGetDifficulty() {
       $result_array = $this->makeRazrbitRequest("/network/getDifficulty");
@@ -320,7 +318,7 @@ class Razrbit
       if(!empty($result_array['difficulty'])) {
           return $result_array['difficulty'];
       } else {
-          throw new \Exception("Unable to parse result.");
+          throw new Exception("Unable to parse result.");
       }
   }
   
@@ -329,11 +327,11 @@ class Razrbit
    * 
    * @param String $transaction
    * @return Boolean success
-   * @throws \Exception
+   * @throws Exception
    */
   public function networkPushTransaction($transaction) {
       if(!self::couldBeATransaction($transaction)) {
-          throw new \Exception("Invalid transaction " . $transaction);
+          throw new Exception("Invalid transaction " . $transaction);
       }
       $params = $this->baseCurlParams;
       $params['transaction'] = $transaction;
@@ -342,7 +340,7 @@ class Razrbit
       if(!empty($result_array['result'])) {
           return $result_array['result'] == "OK";
       } else {
-          throw new \Exception("Unable to parse result.");
+          throw new Exception("Unable to parse result.");
       }
   }
   
@@ -351,11 +349,11 @@ class Razrbit
    * 
    * @param String $currencyCode = valid ISO 4217 code such as USD or EUR. 
    * @return String representing price per Bitcoin
-   * @throws \Exception
+   * @throws Exception
    */
   public function marketsPrice($currencyCode) {
       if(!self::couldBeACurrencyCode($currencyCode)) {
-          throw new \Exception("Invalid currencyCode " . $currencyCode);
+          throw new Exception("Invalid currencyCode " . $currencyCode);
       }
       $params = $this->baseCurlParams;
       $params['currencyCode'] = $currencyCode;
@@ -364,7 +362,7 @@ class Razrbit
       if(!empty($result_array['price'])) {
           return $result_array['price'];
       } else {
-          throw new \Exception("Unable to parse result.");
+          throw new Exception("Unable to parse result.");
       }
   }
     
@@ -373,11 +371,11 @@ class Razrbit
    * 
    * @param String $currencyCode = valid ISO 4217 code such as USD or EUR. 
    * @return String representing Bitcoin price
-   * @throws \Exception
+   * @throws Exception
    */
   public function marketsDayPrice($currencyCode) {
       if(!self::couldBeACurrencyCode($currencyCode)) {
-          throw new \Exception("Invalid currencyCode " . $currencyCode);
+          throw new Exception("Invalid currencyCode " . $currencyCode);
       }
       $params = $this->baseCurlParams;
       $params['currencyCode'] = $currencyCode;
@@ -386,7 +384,7 @@ class Razrbit
       if(!empty($result_array['dayPrice'])) {
           return $result_array['dayPrice'];
       } else {
-          throw new \Exception("Unable to parse result.");
+          throw new Exception("Unable to parse result.");
       }
   }
     
@@ -397,14 +395,14 @@ class Razrbit
    * @param String $currencyCode = valid ISO 4217 code such as USD or EUR. 
    * @param String $yyyymmdd date in yyyy-mm-dd format
    * @return String representation of asking price per Bitcoin on the given date
-   * @throws \Exception
+   * @throws Exception
    */
   public function marketsHistoricalPrice($currencyCode,$yyyymmdd) {
       if(!self::couldBeACurrencyCode($currencyCode)) {
-          throw new \Exception("Invalid currencyCode " . $currencyCode);
+          throw new Exception("Invalid currencyCode " . $currencyCode);
       }
       if(!self::isHyphenatedYYYYMMDDFormat($yyyymmdd)) {
-          throw new \Exception("Date must be in yyyy-mm-dd format " . $yyyymmdd);
+          throw new Exception("Date must be in yyyy-mm-dd format " . $yyyymmdd);
       }
       $params = $this->baseCurlParams;
       $params['currencyCode'] = $currencyCode;
@@ -414,7 +412,7 @@ class Razrbit
       if(!empty($result_array['price'])) {
           return $result_array['price'];
       } else {
-          throw new \Exception("Unable to parse result.");
+          throw new Exception("Unable to parse result.");
       }
   }
     
@@ -425,14 +423,14 @@ class Razrbit
    * @param String $address
    * @param String $email
    * @return Boolean
-   * @throws \Exception
+   * @throws Exception
    */
   public function notificationsAddress($address,$email) {
       if(!self::couldBeAnAddress($address)) {
-          throw new \Exception("Invalid address " . $address);
+          throw new Exception("Invalid address " . $address);
       }
       if(!self::couldBeAnEmail($email)) {
-          throw new \Exception("Invalid email " . $email);
+          throw new Exception("Invalid email " . $email);
       }
       $params = $this->baseCurlParams;
       $params['address'] = $address;
@@ -442,7 +440,7 @@ class Razrbit
       if(!empty($result_array['result'])) {
           return $result_array['result'] == "OK";
       } else {
-          throw new \Exception("Unable to parse result.");
+          throw new Exception("Unable to parse result.");
       }
   }
   /**
@@ -451,14 +449,14 @@ class Razrbit
    * @param String $blockHash
    * @param String $email
    * @return Boolean
-   * @throws \Exception
+   * @throws Exception
    */
   public function notificationsBlock($blockHash,$email) {
       if(!self::couldBeABlockHash($blockHash)) {
-          throw new \Exception("Invalid blockHash " . $blockHash);
+          throw new Exception("Invalid blockHash " . $blockHash);
       }
       if(!self::couldBeAnEmail($email)) {
-          throw new \Exception("Invalid email " . $email);
+          throw new Exception("Invalid email " . $email);
       }
       $params = $this->baseCurlParams;
       $params['blockHash'] = $blockHash;
@@ -468,7 +466,7 @@ class Razrbit
       if(!empty($result_array['result'])) {
           return $result_array['result'] == "OK";
       } else {
-          throw new \Exception("Unable to parse result.");
+          throw new Exception("Unable to parse result.");
       }
   }
       
@@ -478,14 +476,14 @@ class Razrbit
    * @param String $transactionHash
    * @param String $email
    * @return Boolean
-   * @throws \Exception
+   * @throws Exception
    */
   public function notificationsTransaction($transactionHash,$email) {
       if(!self::couldBeABlockHash($transactionHash)) {
-          throw new \Exception("Invalid transactionHash " . $transactionHash);
+          throw new Exception("Invalid transactionHash " . $transactionHash);
       }
       if(!self::couldBeAnEmail($email)) {
-          throw new \Exception("Invalid email " . $email);
+          throw new Exception("Invalid email " . $email);
       }
       $params = $this->baseCurlParams;
       $params['transactionHash'] = $transactionHash;
@@ -495,7 +493,7 @@ class Razrbit
       if(!empty($result_array['result'])) {
           return $result_array['result'] == "OK";
       } else {
-          throw new \Exception("Unable to parse result.");
+          throw new Exception("Unable to parse result.");
       }
   }
   
