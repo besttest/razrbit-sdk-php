@@ -21,7 +21,7 @@ class Razrbit
   /**
    * Version of this API code.
    */
-  const VERSION = '0.1.1';
+  const VERSION = '0.2.0';
 
   /**
    * curl requests are sent to this URL.
@@ -52,7 +52,7 @@ class Razrbit
     CURLOPT_CONNECTTIMEOUT => 10,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_TIMEOUT        => 60,
-    CURLOPT_USERAGENT      => 'razrbit-php-0.1.1'
+    CURLOPT_USERAGENT      => 'razrbit-php-0.2.0'
   );
 
   /**
