@@ -201,7 +201,6 @@ class Razrbit
       $params['address'] = $address;
       $result_array = $this->makeRazrbitRequest("/wallet/getBalanceFromAddress",$params);
       
-      print_r($result_array); 
       if(is_float($result_array['balance'])) {
           return $result_array['balance'];
       } else {
